@@ -3,91 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BFHL · Hierarchy Resolver</title>
-<style>
-  :root{
-    --bg:#0b1014; --panel:#111a21; --line:#1d2a33; --ink:#e8f0f2;
-    --muted:#7d94a0; --acc:#42e2b8; --acc2:#ffb454; --warn:#ff6b6b; --node:#8ad7ff;
-    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:
-      radial-gradient(circle at 12% -10%,rgba(66,226,184,.08),transparent 40%),
-      radial-gradient(circle at 90% 0%,rgba(138,215,255,.06),transparent 45%),
-      var(--bg);
-    color:var(--ink);font-family:var(--mono);min-height:100vh;line-height:1.5}
-  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
-  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px}
-  .eyebrow{color:var(--acc);letter-spacing:.32em;font-size:11px;text-transform:uppercase}
-  h1{font-size:clamp(28px,5vw,44px);margin:8px 0 4px;font-weight:700;letter-spacing:-.5px}
-  h1 span{color:var(--muted)}
-  .sub{color:var(--muted);font-size:13px;max-width:560px}
-  .grid{display:grid;grid-template-columns:1fr;gap:24px}
-  @media(min-width:880px){.grid{grid-template-columns:380px 1fr}}
-  label{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-  textarea{width:100%;min-height:240px;background:var(--panel);border:1px solid var(--line);
-    border-radius:10px;color:var(--ink);font-family:var(--mono);font-size:13px;padding:14px;resize:vertical}
-  textarea:focus{outline:none;border-color:var(--acc)}
-  .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-  button{font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;
-    padding:11px 18px;border:1px solid var(--line);background:var(--panel);color:var(--ink);transition:.15s}
-  button:hover{border-color:var(--acc)}
-  button.primary{background:var(--acc);color:#04130d;border-color:var(--acc)}
-  button.primary:hover{filter:brightness(1.08)}
-  button:disabled{opacity:.5;cursor:not-allowed}
-  .hint{font-size:11px;color:var(--muted);margin-top:10px}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-  .stat{background:#0c151b;border:1px solid var(--line);border-radius:10px;padding:14px}
-  .stat b{display:block;font-size:26px;color:var(--acc)}
-  .stat small{color:var(--muted);font-size:10px;letter-spacing:.15em;text-transform:uppercase}
-  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#0c151b}
-  .card.cycle{border-color:rgba(255,107,107,.4)}
-  .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-  .rootbadge{font-weight:700;color:var(--acc)}
-  .tag{font-size:10px;padding:3px 8px;border-radius:20px;letter-spacing:.1em;text-transform:uppercase}
-  .tag.depth{background:rgba(138,215,255,.12);color:var(--node)}
-  .tag.cyc{background:rgba(255,107,107,.14);color:var(--warn)}
-  .tree{font-size:13px;line-height:1.8}
-  .tree ul{list-style:none;margin:0;padding-left:18px;border-left:1px dashed var(--line)}
-  .tree>ul{padding-left:0;border:none}
-  .tree li{position:relative;padding-left:14px}
-  .tree li::before{content:"";position:absolute;left:0;top:14px;width:10px;height:1px;background:var(--line)}
-  .tree>ul>li::before{display:none}
-  .nd{display:inline-block;background:#10212b;border:1px solid var(--line);border-radius:6px;
-    padding:1px 9px;color:var(--node);font-weight:600;margin:3px 0}
-  .nd.root{color:var(--acc);border-color:rgba(66,226,184,.5)}
-  .lists{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
-  @media(max-width:600px){.lists{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
-  .chip{display:inline-block;font-size:11px;padding:3px 8px;margin:3px 4px 0 0;border-radius:6px;
-    background:#0c151b;border:1px solid var(--line)}
-  .chip.bad{color:var(--warn);border-color:rgba(255,107,107,.3)}
-  .chip.dup{color:var(--acc2);border-color:rgba(255,180,84,.3)}
-  .empty{color:var(--muted);font-size:12px}
-  .error{background:rgba(255,107,107,.1);border:1px solid var(--warn);color:#ffd1d1;
-    padding:14px 16px;border-radius:10px;font-size:13px}
-  .placeholder{color:var(--muted);font-size:13px;text-align:center;padding:50px 0}
-  .id{font-size:11px;color:var(--muted);border-top:1px solid var(--line);margin-top:18px;padding-top:12px}
-  .id span{color:var(--ink)}
-  .spin{display:inline-block;width:12px;height:12px;border:2px solid #04130d;border-top-color:transparent;
-    border-radius:50%;animation:s .6s linear infinite;vertical-align:-1px;margin-right:6px}
-  @keyframes s{to{transform:rotate(360deg)}}
-</style>
+<title>BFHL Hierarchy Resolver</title>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Chitkara Full Stack Challenge · Round 1</div>
-    <h1>Hierarchy <span>Resolver</span></h1>
-    <p class="sub">Enter edges as <code>X-&gt;Y</code> (single uppercase letters). The API parses them into trees, detects cycles, and flags invalid &amp; duplicate edges.</p>
-  </header>
+<h1>BFHL Hierarchy Resolver</h1>
 
-  <div class="grid">
-    <section>
-      <label for="api">API base url</label>
-      <input id="api" style="width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:var(--mono);font-size:12px;padding:10px;margin-bottom:16px" value="" placeholder="https://your-api.onrender.com" />
-      <label for="data">Node list (one per line, or JSON array)</label>
-      <textarea id="data">A->B
+<label for="data">Enter node list (one per line or JSON array):</label><br>
+<textarea id="data" rows="10" cols="50">A->B
 A->C
 B->D
 C->E
@@ -102,108 +24,87 @@ G->H
 G->I
 hello
 1->2
-A-></textarea>
-      <div class="row">
-        <button class="primary" id="run">Resolve hierarchy</button>
-        <button id="clear">Clear</button>
-      </div>
-      <p class="hint">Lines are sent as the <code>data</code> array. Whitespace is trimmed server-side. Leave API url blank to call same origin.</p>
-    </section>
+A-></textarea><br><br>
+<button id="run">Submit</button>
+<button id="clear">Clear</button>
 
-    <section class="panel" id="out">
-      <div class="placeholder">Submit a node list to see the resolved hierarchy.</div>
-    </section>
-  </div>
-</div>
+<div id="out"></div>
 
 <script>
-const $ = (s)=>document.querySelector(s);
-const esc = (s)=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-function parseInput(raw){
+function parseInput(raw) {
   const t = raw.trim();
-  if(t.startsWith("[")){ try{ const a=JSON.parse(t); if(Array.isArray(a)) return a; }catch(e){} }
-  return t.split(/\r?\n/).map(l=>l.replace(/\s+$/,"")).filter((l,i,arr)=> l.length || true);
+  if (t.startsWith("[")) { try { const a = JSON.parse(t); if (Array.isArray(a)) return a; } catch(e) {} }
+  return t.split(/\r?\n/);
 }
 
-function renderTree(obj, isRoot=true){
-  const keys = Object.keys(obj||{});
-  if(!keys.length) return "";
-  let html = "<ul>";
-  for(const k of keys){
-    const cls = isRoot ? "nd root" : "nd";
-    html += `<li><span class="${cls}">${esc(k)}</span>${renderTree(obj[k],false)}</li>`;
+function renderTree(obj, indent) {
+  let s = "";
+  for (const k of Object.keys(obj || {})) {
+    s += indent + k + "\n";
+    s += renderTree(obj[k], indent + "  ");
   }
-  return html+"</ul>";
+  return s;
 }
 
-function render(res){
-  const out = $("#out");
-  const s = res.summary||{};
-  let html = "";
+function render(res) {
+  const out = document.getElementById("out");
+  let html = "<h2>Result</h2>";
 
-  html += `<div class="stats">
-    <div class="stat"><b>${s.total_trees??0}</b><small>Trees</small></div>
-    <div class="stat"><b>${s.total_cycles??0}</b><small>Cycles</small></div>
-    <div class="stat"><b>${esc(s.largest_tree_root||"—")}</b><small>Largest root</small></div>
-  </div>`;
+  const s = res.summary || {};
+  html += "<p><b>Trees:</b> " + (s.total_trees ?? 0) +
+    " | <b>Cycles:</b> " + (s.total_cycles ?? 0) +
+    " | <b>Largest tree root:</b> " + (s.largest_tree_root || "—") + "</p>";
 
-  const h = res.hierarchies||[];
-  if(!h.length){ html += `<p class="empty">No hierarchies produced.</p>`; }
-  for(const node of h){
-    const cyc = node.has_cycle === true;
-    html += `<div class="card ${cyc?"cycle":""}">
-      <div class="card-head">
-        <span class="rootbadge">root ${esc(node.root)}</span>
-        ${cyc ? `<span class="tag cyc">cycle</span>` : `<span class="tag depth">depth ${node.depth}</span>`}
-      </div>
-      ${cyc ? `<p class="empty">Cyclic group — tree omitted.</p>`
-            : `<div class="tree">${renderTree(node.tree)}</div>`}
-    </div>`;
+  for (const h of (res.hierarchies || [])) {
+    if (h.has_cycle) {
+      html += "<h3>Root: " + h.root + " (cycle)</h3>";
+      html += "<p>Cyclic group — no tree.</p>";
+    } else {
+      html += "<h3>Root: " + h.root + " (depth: " + h.depth + ")</h3>";
+      html += "<pre>" + renderTree(h.tree, "") + "</pre>";
+    }
   }
 
-  const inv = res.invalid_entries||[], dup = res.duplicate_edges||[];
-  html += `<div class="lists">
-    <div><label>Invalid entries (${inv.length})</label>${
-      inv.length ? inv.map(x=>`<span class="chip bad">${esc(x===""?'""':x)}</span>`).join("") : `<span class="empty">none</span>`}</div>
-    <div><label>Duplicate edges (${dup.length})</label>${
-      dup.length ? dup.map(x=>`<span class="chip dup">${esc(x)}</span>`).join("") : `<span class="empty">none</span>`}</div>
-  </div>`;
+  const inv = res.invalid_entries || [];
+  const dup = res.duplicate_edges || [];
+  html += "<h3>Invalid entries (" + inv.length + ")</h3>";
+  html += inv.length ? "<p>" + inv.map(x => x === "" ? '""' : x).join(", ") + "</p>" : "<p>None</p>";
+  html += "<h3>Duplicate edges (" + dup.length + ")</h3>";
+  html += dup.length ? "<p>" + dup.join(", ") + "</p>" : "<p>None</p>";
 
-  html += `<div class="id">user_id <span>${esc(res.user_id||"—")}</span> · email <span>${esc(res.email_id||"—")}</span> · roll <span>${esc(res.college_roll_number||"—")}</span></div>`;
+  html += "<hr><p><b>user_id:</b> " + (res.user_id || "") +
+    " | <b>email:</b> " + (res.email_id || "") +
+    " | <b>roll:</b> " + (res.college_roll_number || "") + "</p>";
 
   out.innerHTML = html;
 }
 
-async function run(){
-  const btn = $("#run");
-  const base = $("#api").value.trim().replace(/\/+$/,"");
-  const url = (base || "") + "/bfhl";
-  const data = parseInput($("#data").value);
-
-  btn.disabled = true; btn.innerHTML = `<span class="spin"></span>Resolving…`;
-  $("#out").innerHTML = `<div class="placeholder">Calling ${esc(url)} …</div>`;
-  try{
-    const r = await fetch(url, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
+document.getElementById("run").addEventListener("click", async function() {
+  const btn = this;
+  const data = parseInput(document.getElementById("data").value);
+  btn.disabled = true;
+  btn.textContent = "Loading...";
+  document.getElementById("out").innerHTML = "<p>Calling API...</p>";
+  try {
+    const r = await fetch("/bfhl", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ data })
     });
     const json = await r.json();
-    if(!r.ok && !json.hierarchies){
-      throw new Error(json.error || ("HTTP "+r.status));
-    }
     render(json);
-  }catch(err){
-    $("#out").innerHTML = `<div class="error"><b>Request failed.</b><br>${esc(err.message)}<br><br>
-      Check that the API is running, the URL is correct, and CORS is enabled.</div>`;
-  }finally{
-    btn.disabled = false; btn.textContent = "Resolve hierarchy";
+  } catch(err) {
+    document.getElementById("out").innerHTML = "<p style='color:red'><b>Error:</b> " + err.message + "</p>";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Submit";
   }
-}
+});
 
-$("#run").addEventListener("click", run);
-$("#clear").addEventListener("click", ()=>{ $("#data").value=""; $("#out").innerHTML=`<div class="placeholder">Submit a node list to see the resolved hierarchy.</div>`; });
+document.getElementById("clear").addEventListener("click", function() {
+  document.getElementById("data").value = "";
+  document.getElementById("out").innerHTML = "";
+});
 </script>
 </body>
 </html>
