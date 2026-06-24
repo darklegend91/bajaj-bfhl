@@ -1,0 +1,17 @@
+{
+  "name": "bfhl-hierarchy-resolver",
+  "version": "1.0.0",
+  "description": "Chitkara Full Stack Challenge Round 1 — POST /bfhl hierarchy resolver",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
