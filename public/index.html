@@ -4,12 +4,74 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BFHL Hierarchy Resolver</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0 }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; background: #fafafa; line-height: 1.6; padding: 32px 20px 60px }
+  .wrap { max-width: 960px; margin: 0 auto }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px }
+  .sub { font-size: 14px; color: #666; margin-bottom: 28px }
+  .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px }
+  @media (max-width: 700px) { .layout { grid-template-columns: 1fr } }
+
+  label { display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 6px }
+  textarea { width: 100%; min-height: 220px; padding: 12px; font-size: 14px; font-family: 'SF Mono', Consolas, monospace; border: 1px solid #d0d0d0; border-radius: 6px; background: #fff; resize: vertical; color: #1a1a1a }
+  textarea:focus { outline: none; border-color: #333 }
+
+  .btns { display: flex; gap: 8px; margin-top: 12px }
+  button { font-size: 14px; font-weight: 500; padding: 9px 20px; border-radius: 6px; cursor: pointer; border: 1px solid #d0d0d0; background: #fff; color: #1a1a1a; transition: background 0.15s }
+  button:hover { background: #f0f0f0 }
+  button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a }
+  button.primary:hover { background: #333 }
+  button:disabled { opacity: 0.5; cursor: wait }
+
+  .result { min-height: 200px }
+  .placeholder { color: #999; font-size: 14px; padding-top: 40px; text-align: center }
+
+  .summary { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap }
+  .summary-item { flex: 1; min-width: 120px; padding: 14px; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px }
+  .summary-item .val { font-size: 28px; font-weight: 600 }
+  .summary-item .lbl { font-size: 12px; color: #888; margin-top: 2px }
+
+  .hierarchy { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; margin-bottom: 12px }
+  .hierarchy.cycle { border-left: 3px solid #d9534f }
+  .hierarchy:not(.cycle) { border-left: 3px solid #1a1a1a }
+  .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px }
+  .h-root { font-weight: 600; font-size: 15px }
+  .badge { font-size: 11px; padding: 2px 10px; border-radius: 20px; font-weight: 500 }
+  .badge.depth { background: #f0f0f0; color: #444 }
+  .badge.cyc { background: #fdf0f0; color: #d9534f }
+
+  .tree-view { font-family: 'SF Mono', Consolas, monospace; font-size: 13px; line-height: 1.9 }
+  .tree-view ul { list-style: none; padding-left: 20px }
+  .tree-view > ul { padding-left: 0 }
+  .tree-view li { position: relative }
+  .tree-view li::before { content: ""; position: absolute; left: -14px; top: 0; bottom: 0; width: 1px; background: #ddd }
+  .tree-view li::after { content: ""; position: absolute; left: -14px; top: 15px; width: 10px; height: 1px; background: #ddd }
+  .tree-view > ul > li::before, .tree-view > ul > li::after { display: none }
+  .node { display: inline-block; padding: 1px 8px; border: 1px solid #ddd; border-radius: 4px; font-weight: 500; background: #fafafa }
+  .node.root { background: #1a1a1a; color: #fff; border-color: #1a1a1a }
+  .cycle-msg { color: #999; font-size: 13px; font-style: italic }
+
+  .section-title { font-size: 13px; font-weight: 600; color: #444; margin: 20px 0 8px }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px }
+  .chip { font-size: 12px; padding: 3px 10px; border-radius: 4px; font-family: 'SF Mono', Consolas, monospace }
+  .chip.invalid { background: #fdf0f0; color: #d9534f; border: 1px solid #f5d5d5 }
+  .chip.dup { background: #fff8ed; color: #b8860b; border: 1px solid #f0e0c0 }
+  .none { font-size: 13px; color: #999 }
+
+  .identity { font-size: 12px; color: #999; border-top: 1px solid #e8e8e8; margin-top: 20px; padding-top: 12px }
+  .error-box { background: #fdf0f0; border: 1px solid #f0d0d0; color: #b33; padding: 14px; border-radius: 6px; font-size: 14px }
+</style>
 </head>
 <body>
-<h1>BFHL Hierarchy Resolver</h1>
+<div class="wrap">
+  <h1>Hierarchy Resolver</h1>
+  <p class="sub">Enter edges as X->Y (single uppercase letters) to build trees and detect cycles.</p>
 
-<label for="data">Enter node list (one per line or JSON array):</label><br>
-<textarea id="data" rows="10" cols="50">A->B
+  <div class="layout">
+    <div>
+      <label for="data">Node list</label>
+      <textarea id="data">A->B
 A->C
 B->D
 C->E
@@ -24,11 +86,18 @@ G->H
 G->I
 hello
 1->2
-A-></textarea><br><br>
-<button id="run">Submit</button>
-<button id="clear">Clear</button>
+A-></textarea>
+      <div class="btns">
+        <button class="primary" id="run">Submit</button>
+        <button id="clear">Clear</button>
+      </div>
+    </div>
 
-<div id="out"></div>
+    <div class="result" id="out">
+      <p class="placeholder">Results will appear here after you submit.</p>
+    </div>
+  </div>
+</div>
 
 <script>
 function parseInput(raw) {
@@ -37,54 +106,78 @@ function parseInput(raw) {
   return t.split(/\r?\n/);
 }
 
-function renderTree(obj, indent) {
-  let s = "";
-  for (const k of Object.keys(obj || {})) {
-    s += indent + k + "\n";
-    s += renderTree(obj[k], indent + "  ");
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function renderTree(obj, isRoot) {
+  const keys = Object.keys(obj || {});
+  if (!keys.length) return "";
+  let html = "<ul>";
+  for (const k of keys) {
+    const cls = isRoot ? "node root" : "node";
+    html += '<li><span class="' + cls + '">' + esc(k) + "</span>" + renderTree(obj[k], false) + "</li>";
   }
-  return s;
+  return html + "</ul>";
 }
 
 function render(res) {
-  const out = document.getElementById("out");
-  let html = "<h2>Result</h2>";
-
   const s = res.summary || {};
-  html += "<p><b>Trees:</b> " + (s.total_trees ?? 0) +
-    " | <b>Cycles:</b> " + (s.total_cycles ?? 0) +
-    " | <b>Largest tree root:</b> " + (s.largest_tree_root || "—") + "</p>";
+  let html = "";
+
+  html += '<div class="summary">';
+  html += '<div class="summary-item"><div class="val">' + (s.total_trees ?? 0) + '</div><div class="lbl">Trees</div></div>';
+  html += '<div class="summary-item"><div class="val">' + (s.total_cycles ?? 0) + '</div><div class="lbl">Cycles</div></div>';
+  html += '<div class="summary-item"><div class="val">' + esc(s.largest_tree_root || "—") + '</div><div class="lbl">Largest root</div></div>';
+  html += "</div>";
 
   for (const h of (res.hierarchies || [])) {
-    if (h.has_cycle) {
-      html += "<h3>Root: " + h.root + " (cycle)</h3>";
-      html += "<p>Cyclic group — no tree.</p>";
-    } else {
-      html += "<h3>Root: " + h.root + " (depth: " + h.depth + ")</h3>";
-      html += "<pre>" + renderTree(h.tree, "") + "</pre>";
-    }
+    const cyc = h.has_cycle === true;
+    html += '<div class="hierarchy ' + (cyc ? "cycle" : "") + '">';
+    html += '<div class="h-header">';
+    html += '<span class="h-root">Root: ' + esc(h.root) + "</span>";
+    html += cyc
+      ? '<span class="badge cyc">Cycle</span>'
+      : '<span class="badge depth">Depth ' + h.depth + "</span>";
+    html += "</div>";
+    html += cyc
+      ? '<p class="cycle-msg">Cyclic group — tree cannot be displayed.</p>'
+      : '<div class="tree-view">' + renderTree(h.tree, true) + "</div>";
+    html += "</div>";
   }
 
   const inv = res.invalid_entries || [];
   const dup = res.duplicate_edges || [];
-  html += "<h3>Invalid entries (" + inv.length + ")</h3>";
-  html += inv.length ? "<p>" + inv.map(x => x === "" ? '""' : x).join(", ") + "</p>" : "<p>None</p>";
-  html += "<h3>Duplicate edges (" + dup.length + ")</h3>";
-  html += dup.length ? "<p>" + dup.join(", ") + "</p>" : "<p>None</p>";
 
-  html += "<hr><p><b>user_id:</b> " + (res.user_id || "") +
-    " | <b>email:</b> " + (res.email_id || "") +
-    " | <b>roll:</b> " + (res.college_roll_number || "") + "</p>";
+  html += '<div class="section-title">Invalid entries (' + inv.length + ")</div>";
+  if (inv.length) {
+    html += '<div class="chips">';
+    for (const x of inv) html += '<span class="chip invalid">' + esc(x === "" ? '""' : x) + "</span>";
+    html += "</div>";
+  } else {
+    html += '<p class="none">None</p>';
+  }
 
-  out.innerHTML = html;
+  html += '<div class="section-title">Duplicate edges (' + dup.length + ")</div>";
+  if (dup.length) {
+    html += '<div class="chips">';
+    for (const x of dup) html += '<span class="chip dup">' + esc(x) + "</span>";
+    html += "</div>";
+  } else {
+    html += '<p class="none">None</p>';
+  }
+
+  html += '<div class="identity">' + esc(res.user_id || "") + " · " + esc(res.email_id || "") + " · " + esc(res.college_roll_number || "") + "</div>";
+
+  document.getElementById("out").innerHTML = html;
 }
 
-document.getElementById("run").addEventListener("click", async function() {
+document.getElementById("run").addEventListener("click", async function () {
   const btn = this;
   const data = parseInput(document.getElementById("data").value);
   btn.disabled = true;
-  btn.textContent = "Loading...";
-  document.getElementById("out").innerHTML = "<p>Calling API...</p>";
+  btn.textContent = "Loading…";
+  document.getElementById("out").innerHTML = '<p class="placeholder">Calling API…</p>';
   try {
     const r = await fetch("/bfhl", {
       method: "POST",
@@ -93,17 +186,17 @@ document.getElementById("run").addEventListener("click", async function() {
     });
     const json = await r.json();
     render(json);
-  } catch(err) {
-    document.getElementById("out").innerHTML = "<p style='color:red'><b>Error:</b> " + err.message + "</p>";
+  } catch (err) {
+    document.getElementById("out").innerHTML = '<div class="error-box"><b>Request failed.</b><br>' + esc(err.message) + "</div>";
   } finally {
     btn.disabled = false;
     btn.textContent = "Submit";
   }
 });
 
-document.getElementById("clear").addEventListener("click", function() {
+document.getElementById("clear").addEventListener("click", function () {
   document.getElementById("data").value = "";
-  document.getElementById("out").innerHTML = "";
+  document.getElementById("out").innerHTML = '<p class="placeholder">Results will appear here after you submit.</p>';
 });
 </script>
 </body>

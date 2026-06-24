@@ -30,30 +30,6 @@ npm start          # http://localhost:3000  (frontend + API)
 npm test           # runs the spec example through the processor
 ```
 
-## ⚠️ Before submitting — set your real credentials
-Edit the `IDENTITY` object near the top of **`server.js`**:
-```js
-const IDENTITY = {
-  user_id: "fullname_ddmmyyyy",   // e.g. adityapathania_21092004
-  email_id: "your.email@chitkara.edu.in",
-  college_roll_number: "YOUR_ROLL",
-};
-```
-
-## Deploy (Render — recommended, free)
-1. Push this folder to a **public GitHub repo**.
-2. On [render.com](https://render.com): **New → Web Service** → connect the repo.
-3. Build command: `npm install` · Start command: `npm start`.
-4. Render sets `PORT` automatically (the server reads `process.env.PORT`).
-5. Your API base url is the Render URL; the evaluator calls `<url>/bfhl`.
-6. The frontend is served at the **same** url root `/`.
-
-`render.yaml` is included for one-click blueprint deploys.
-
-### Deploy on Vercel / Railway / Netlify
-Any Node host works. Ensure the start command is `node server.js` and that the
-platform's injected `PORT` is used (already handled).
-
 ## Implemented rules
 - Validation `^[A-Z]->[A-Z]$`, whitespace trimmed, self-loops invalid.
 - Duplicate edges recorded once (first occurrence builds the tree).
